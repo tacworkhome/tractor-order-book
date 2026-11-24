@@ -1,0 +1,304 @@
+<title>One Order Book</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;700&display=swap">
+<style>
+/* Layout: single reading column, wide diagram + table scroll inside own boxes. Signal yellow used only for "NOT BUILT / to prove" markers. */
+:root{
+  --bg:#f3f5f2; --surface:#ffffff; --fg:#17211b; --muted:#5b6a60; --line:#d5ddd6;
+  --green:#1f5a3f; --green-soft:#e1efe6; --signal:#b8860b; --signal-soft:#fbf0cf; --red:#a33a2a;
+  --display:'Space Grotesk',system-ui,sans-serif; --body:'Inter',system-ui,sans-serif; --mono:'JetBrains Mono',ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f1612; --surface:#17211b; --fg:#e8efe9; --muted:#9fb0a5; --line:#2b3a31;
+  --green:#6fcf9b; --green-soft:#16301f; --signal:#f2c14e; --signal-soft:#33290d; --red:#ef8b78; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1612; --surface:#17211b; --fg:#e8efe9; --muted:#9fb0a5; --line:#2b3a31;
+  --green:#6fcf9b; --green-soft:#16301f; --signal:#f2c14e; --signal-soft:#33290d; --red:#ef8b78; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.6;
+  padding-block:48px 96px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+main{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:56px}
+h1,h2,h3{font-family:var(--display);line-height:1.15;text-wrap:balance;margin:0}
+h1{font-size:clamp(2.2rem,6vw,3.4rem);letter-spacing:-.02em}
+h2{font-size:1.7rem;letter-spacing:-.01em}
+h3{font-size:1.05rem}
+p{margin:0}
+.eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.lede{font-size:1.15rem;color:var(--muted);max-width:60ch}
+section{display:flex;flex-direction:column;gap:18px;min-width:0}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:18px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.card p,.card li{color:var(--muted);font-size:.95rem}
+ul{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:6px}
+.tag{font-family:var(--mono);font-size:.7rem;padding:2px 8px;border-radius:3px;background:var(--green-soft);color:var(--green);width:fit-content}
+.tag.warn{background:var(--signal-soft);color:var(--signal)}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:6px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:.9rem}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+tr:last-child td{border-bottom:0}
+svg{display:block;width:100%;min-width:640px;height:auto}
+svg text{font-family:var(--mono);font-size:12px;fill:var(--fg)}
+svg .b{fill:var(--surface);stroke:var(--line);stroke-width:1.5}
+svg .g{fill:var(--green-soft);stroke:var(--green);stroke-width:1.5}
+svg .w{fill:var(--signal-soft);stroke:var(--signal);stroke-width:1.5;stroke-dasharray:4 3}
+svg .l{stroke:var(--muted);stroke-width:1.5;fill:none}
+svg .m{fill:var(--muted)}
+.callout{border-left:3px solid var(--signal);padding:4px 0 4px 16px;color:var(--fg)}
+.todo{background:var(--signal-soft);border:1px dashed var(--signal);border-radius:6px;padding:14px 16px;font-size:.92rem}
+.btn{font:500 .9rem var(--body);background:var(--green);color:var(--bg);border:0;border-radius:4px;padding:10px 16px;cursor:pointer}
+.btn:hover{opacity:.9}
+code{font-family:var(--mono);font-size:.85em;background:var(--green-soft);padding:1px 5px;border-radius:3px}
+a{color:var(--green)}
+:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+</style>
+
+<main>
+<header style="display:flex;flex-direction:column;gap:14px">
+  <span class="eyebrow">Tractor Foods · Build Challenge 2026 · Software, AI &amp; Automation Lead</span>
+  <h1>One order book. Every channel. Printed before the rider arrives.</h1>
+  <p class="lede">How DoorDash and Uber Eats orders get into Tractor's own system and onto Epson chits without a middleman, what I would build in the first 90 days, and the one agent I want to try first.</p>
+</header>
+
+<section id="tldr">
+  <span class="eyebrow">The answer in 30 seconds</span>
+  <div class="grid2">
+    <div class="card"><h3>1 · Get in the door</h3><p>Apply for direct DoorDash and Uber Eats API access on day one. Use a month-to-month certified aggregator as a bridge so January does not depend on their approval clock.</p></div>
+    <div class="card"><h3>2 · Own the middle</h3><p>One order book, one adapter per channel, one status line. Printing is tracked like any other status, so a missed chit is an alert, not a surprise.</p></div>
+    <div class="card"><h3>3 · Prove the money</h3><p>Fees and payouts are reconciled per order. That is also my first experiment: an agent that audits marketplace payouts.</p></div>
+  </div>
+  <p><a href="#demo">Skip to the clickable prototype ↓</a></p>
+</section>
+
+<section id="map">
+  <span class="eyebrow">The shape of it</span>
+  <h2>Everything lands as one order, with one number</h2>
+  <p>Your Counter, Kiosk, Catering and Order channels already write to the order desk. The missing pieces are three inbound connections and two outbound ones. All five meet at a single order book that owns the state of every ticket.</p>
+  <div class="scroll"><svg viewBox="0 0 760 330" role="img" aria-label="Architecture: channels feed an adapter layer into the order book, which drives printers, driver booking and accounting">
+    <rect class="b" x="10" y="20" width="150" height="40" rx="4"/><text x="24" y="45">Counter / Kiosk</text>
+    <rect class="b" x="10" y="70" width="150" height="40" rx="4"/><text x="24" y="95">Catering / Website</text>
+    <rect class="w" x="10" y="130" width="150" height="40" rx="4"/><text x="24" y="155">DoorDash</text>
+    <rect class="w" x="10" y="180" width="150" height="40" rx="4"/><text x="24" y="205">Uber Eats</text>
+    <rect class="w" x="10" y="240" width="150" height="40" rx="4"/><text x="24" y="265">Tractor Deliver</text>
+    <rect class="g" x="250" y="110" width="160" height="110" rx="6"/>
+    <text x="270" y="145">ORDER BOOK</text><text class="m" x="270" y="168">one id per order</text><text class="m" x="270" y="186">store · due time</text><text class="m" x="270" y="204">ticket status</text>
+    <path class="l" d="M160 40 L250 150M160 90 L250 160M160 150 L250 165M160 200 L250 180M160 260 L250 200"/>
+    <rect class="b" x="520" y="20" width="220" height="50" rx="4"/><text x="536" y="50">Epson chits by station</text>
+    <rect class="b" x="520" y="95" width="220" height="50" rx="4"/><text x="536" y="125">Driver booking + tracking</text>
+    <rect class="b" x="520" y="170" width="220" height="50" rx="4"/><text x="536" y="200">Fees + payouts ledger</text>
+    <rect class="b" x="520" y="245" width="220" height="50" rx="4"/><text x="536" y="275">Sales + tax export</text>
+    <path class="l" d="M410 150 L520 45M410 160 L520 120M410 175 L520 195M410 190 L520 270"/>
+    <text class="m" x="10" y="318">dashed = to build / prove</text>
+  </svg></div>
+</section>
+
+<section id="marketplaces">
+  <span class="eyebrow">01 · DoorDash and Uber Eats</span>
+  <h2>Both have an official door in. Both gate it.</h2>
+  <p>"No middleman" has two meanings: no tablet in the kitchen, and no aggregator taking a monthly fee per store. Both are reachable. The marketplace commission itself stays, because that is what you pay them for customers.</p>
+  <div class="grid2">
+    <div class="card"><span class="tag">DoorDash</span><h3>Marketplace API, order injection</h3>
+    <ul><li>Orders are pushed to a webhook on our server, and we confirm or reject them.</li>
+    <li>Access is by application and approval through the developer portal. No public timeline.</li>
+    <li>Single-merchant integrations use the Store Onboarding Webhook, and a Business Admin approves each store in the Merchant Portal.</li>
+    <li>Their graduation bar is high: about 98% successful injection over 14+ days. That is built for multi-store vendors, which is a mismatch for one brand.</li></ul></div>
+    <div class="card"><span class="tag">Uber Eats</span><h3>Marketplace API, POS integration</h3>
+    <ul><li>Orders arrive as a webhook. We return HTTP 200, then must accept or deny within about 11.5 minutes or the order auto-cancels.</li>
+    <li>Start in a sandbox. Production needs an NDA, an API licence agreement and written approval through an Uber partner manager.</li>
+    <li>Go live per store by switching POS integration on for a pilot store first.</li>
+    <li>Only one primary webhook URL per app, so routing by store happens on our side.</li></ul></div>
+  </div>
+  <h3>Three ways in, ranked</h3>
+  <div class="scroll"><table>
+    <tr><th>Path</th><th>What it is</th><th>Cost / risk</th><th>Verdict</th></tr>
+    <tr><td>A. Direct API</td><td>We apply as a single-brand integrator to both marketplaces</td><td>Approval time unknown, certification work, but no recurring fee</td><td><b>Target state</b>. Apply in week 1, because the clock is theirs.</td></tr>
+    <tr><td>B. Certified aggregator</td><td>An existing partner (Otter, Deliverect, Chowly style) already holds the approvals and forwards orders to our API</td><td>Monthly fee per store, and a third party in the order path</td><td><b>January bridge</b>. Contract month to month, and keep our adapter interface identical so we can swap it out.</td></tr>
+    <tr><td>C. Tablets as is</td><td>Keep the tablets, key orders in by hand</td><td>Errors, no print, no payout data</td><td>Fallback only. Both platforms keep tablet as the failure protocol anyway.</td></tr>
+  </table></div>
+  <p class="callout"><b>The real roadblock is the calendar, not the code.</b> The Kits store reopens in January. Approval cannot be forced, so the plan must work with B and then drop in A without anyone in the kitchen noticing.</p>
+  <p class="eyebrow">Items I have not confirmed and would ask each platform's partner manager</p>
+  <ul>
+    <li>Whether a single-location, single-brand restaurant group is accepted for direct access, or routed to preferred integrators.</li>
+    <li>Whether payout and fee line items are available by API or only as report exports.</li>
+    <li>How GST/PST on marketplace sales is handled (marketplace facilitator), which decides what the accounting export contains. Confirm with your accountant.</li>
+  </ul>
+</section>
+
+<section id="adapter">
+  <span class="eyebrow">The part we own regardless of approval</span>
+  <h2>One adapter per channel, one state machine</h2>
+  <div class="grid2">
+    <div class="card"><h3>Ingest</h3><p>A small webhook service per marketplace. It verifies the signature, stores the raw payload untouched, maps it to Tractor's order shape and writes it to the order book. The raw copy means we can replay anything.</p></div>
+    <div class="card"><h3>Idempotency</h3><p>Marketplace order id plus store id is a unique key. Retries and duplicate webhooks cannot make two tickets.</p></div>
+    <div class="card"><h3>Accept rules</h3><p>Auto-accept when the kitchen is under a load limit and every item is in stock. Otherwise alert a human well inside the 11.5 minute window, and deny with a reason before it times out.</p></div>
+    <div class="card"><h3>Status</h3><p><code>received → accepted → printed → preparing → ready → picked_up</code>, plus <code>failed</code> and <code>cancelled</code>. Status changes are sent back to the platform, so riders are dispatched at the right moment.</p></div>
+  </div>
+</section>
+
+<section id="printing">
+  <span class="eyebrow">Printing</span>
+  <h2>Print when the order lands, and know when it did not</h2>
+  <ul>
+    <li><b>Printers poll us.</b> Epson's Server Direct Print has the printer fetch jobs from our server, so no open ports, no static IP and no kitchen network changes. Epson notes the printer checks on an interval, so the print queue is the source of truth, and polling is set short.</li>
+    <li><b>One queue, routed by station.</b> Each line item maps to a station (grill, cold, expo). The same order prints a chit per station plus an expo summary.</li>
+    <li><b>Printing is a tracked status, not a hope.</b> A job moves <code>queued → fetched → printed</code>. If an accepted order is not printed within 45 seconds, staff get an alert and the order goes to a reprint screen.</li>
+    <li><b>Dead printer plan.</b> The same ticket shows on the kitchen screen. A one-tap reprint exists for every order.</li>
+    <li>I would prove it with the pilot store's real printer and a test order from each sandbox before January, and measure order-received to chit-printed time.</li>
+  </ul>
+</section>
+
+<section id="demo">
+  <span class="eyebrow">Prototype · simulated, no real integrations</span>
+  <h2>Send an order in, watch it print</h2>
+  <p>Press a channel. The order lands in the order book, is accepted, and prints one chit per station. Turn the printer off to see what happens when a chit does not come out (the 45 second rule runs here in 6 seconds).</p>
+  <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+    <button class="btn" data-ch="DoorDash" id="b1">DoorDash order</button>
+    <button class="btn" data-ch="Uber Eats" id="b2">Uber Eats order</button>
+    <button class="btn" data-ch="Website delivery" id="b3">Website delivery</button>
+    <button class="btn" data-ch="Kiosk" id="b4">Kiosk</button>
+    <label style="display:flex;gap:6px;align-items:center;font-size:.9rem;color:var(--muted)"><input type="checkbox" id="off"> Kitchen printer offline</label>
+  </div>
+  <div class="scroll"><table id="book">
+    <tr><th>Order</th><th>Channel</th><th>Due</th><th>Status</th><th>Printed in</th></tr>
+    <tr id="emptyrow"><td colspan="5" style="color:var(--muted)">No orders yet. Press a channel above.</td></tr>
+  </table></div>
+  <div id="chits" class="grid2"></div>
+  <div id="alertbox" class="todo" hidden></div>
+</section>
+
+<section id="audit">
+  <span class="eyebrow">Experiment preview · sample data</span>
+  <h2>What the payout auditor finds</h2>
+  <p>Five example orders compared against what the platform paid. These numbers are made up to show the output, not real Tractor data.</p>
+  <div class="scroll"><table>
+    <tr><th>Order</th><th>Channel</th><th>Should receive</th><th>Paid</th><th>Gap</th><th>Finding</th></tr>
+    <tr><td>TF-1042</td><td>DoorDash</td><td>$31.20</td><td>$31.20</td><td>$0.00</td><td>OK</td></tr>
+    <tr><td>TF-1043</td><td>Uber Eats</td><td>$24.80</td><td>$24.80</td><td>$0.00</td><td>OK</td></tr>
+    <tr><td>TF-1047</td><td>DoorDash</td><td>$42.10</td><td>$34.50</td><td style="color:var(--red)">-$7.60</td><td>Item refunded to guest, but the order book shows it was made. Dispute drafted.</td></tr>
+    <tr><td>TF-1051</td><td>Uber Eats</td><td>$27.40</td><td>$23.90</td><td style="color:var(--red)">-$3.50</td><td>Commission charged above the contract rate. Dispute drafted.</td></tr>
+    <tr><td>TF-1055</td><td>DoorDash</td><td>$18.90</td><td>$0.00</td><td style="color:var(--red)">-$18.90</td><td>Order in our book, absent from the payout. Ticket drafted.</td></tr>
+  </table></div>
+  <p><b>$30.00 recoverable</b> from five orders. A person reads each draft and presses send.</p>
+</section>
+
+<script>
+(function(){
+  var n=1040, menu={
+    "DoorDash":[["Brisket sandwich","Grill"],["Slaw","Cold"]],
+    "Uber Eats":[["Pulled pork bowl","Grill"],["Pickles","Cold"],["Brownie","Expo"]],
+    "Website delivery":[["Fried chicken plate","Grill"],["Mac salad","Cold"]],
+    "Kiosk":[["Burger combo","Grill"],["Lemonade","Expo"]]
+  };
+  var book=document.getElementById('book'),chits=document.getElementById('chits'),off=document.getElementById('off'),box=document.getElementById('alertbox');
+  function add(ch){
+    var empty=document.getElementById('emptyrow'); if(empty) empty.remove();
+    var id='TF-'+(++n), t=Date.now(), due=new Date(t+20*60000);
+    var tr=document.createElement('tr');
+    tr.innerHTML='<td>'+id+'</td><td>'+ch+'</td><td>'+due.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})+'</td><td class="st">received</td><td class="pt">–</td>';
+    book.appendChild(tr);
+    var st=tr.querySelector('.st'),pt=tr.querySelector('.pt');
+    setTimeout(function(){st.textContent='accepted';},500);
+    var failed=off.checked;
+    if(failed){
+      setTimeout(function(){st.textContent='NOT PRINTED';st.style.color='var(--red)';pt.textContent='>45 s';
+        box.hidden=false;box.textContent=id+' ('+ch+') accepted but not printed. Staff alerted; it is on the reprint screen.';},6000);
+    } else {
+      setTimeout(function(){st.textContent='printed';pt.textContent=((Date.now()-t)/1000).toFixed(1)+' s';box.hidden=true;draw(id,ch);},1400);
+    }
+  }
+  function draw(id,ch){
+    var stations={};
+    menu[ch].forEach(function(i){(stations[i[1]]=stations[i[1]]||[]).push(i[0]);});
+    Object.keys(stations).forEach(function(s){
+      var d=document.createElement('div');d.className='card';
+      d.innerHTML='<span class="tag">'+s+' chit</span><h3>'+id+' · '+ch+'</h3><p>'+stations[s].join('<br>')+'</p>';
+      chits.prepend(d);
+    });
+    while(chits.children.length>6) chits.lastChild.remove();
+  }
+  ['b1','b2','b3','b4'].forEach(function(b){var el=document.getElementById(b);el.addEventListener('click',function(){add(el.dataset.ch);});});
+})();
+</script>
+
+<section id="plan">
+  <span class="eyebrow">02 · Your 30 to 90 day plan</span>
+  <h2>What is weakest, and what I would build first</h2>
+  <p><b>Riskiest today:</b> two marketplaces run on separate tablets with nothing printed and no financial data, and website delivery has no driver booking or tracking. Sales through three channels have no single record. Printing across all of them is unproven.</p>
+  <div class="scroll"><table>
+    <tr><th>Window</th><th>Build / test</th><th>How we know it works</th></tr>
+    <tr><td>Days 1–10</td><td>Apply to both programs. Sign a bridge aggregator or confirm none is needed. Stand up the order book schema and adapters against sandboxes. Print a chit from a fake order.</td><td>Sandbox order from each platform appears in the order book and prints.</td></tr>
+    <tr><td>Days 10–30</td><td>Tractor Deliver: book a driver through a delivery API such as DoorDash Drive or Uber Direct, store the tracking link, show status to the guest. Kitchen screen and reprint.</td><td>10 test deliveries booked and tracked end to end, quote vs actual fee recorded.</td></tr>
+    <tr><td>Days 30–60</td><td>Pilot at Kits when it reopens, with the tablet still present as a fallback. Daily comparison of marketplace dashboard orders vs order book.</td><td>100% of orders matched for 14 days. Median order-to-chit under 20 seconds. Zero silent drops.</td></tr>
+    <tr><td>Days 60–90</td><td>Fees and payouts ledger, sales and tax export, remove tablets, swap aggregator for direct API when approved.</td><td>Month-end: ledger total equals the bank deposits, and the accountant takes the export without rework.</td></tr>
+  </table></div>
+  <h3>Website delivery</h3>
+  <p>Quote the driver cost at checkout before payment, book after the kitchen accepts, and store the driver id and tracking link on the same order record. Late or cancelled deliveries create an exception row for staff instead of an email nobody sees.</p>
+</section>
+
+<section id="countdown">
+  <span class="eyebrow">Working back from the Kits reopening</span>
+  <h2>The January plan, counted backwards</h2>
+  <p>The reopening date is the fixed point, so every step is counted from it. T-8 means eight weeks before opening. I do not know the exact date, so the first question I would ask is which day it is.</p>
+  <div class="scroll"><table>
+    <tr><th>When</th><th>Done by then</th><th>Gate</th></tr>
+    <tr><td>T-8</td><td>Both marketplace applications sent. Bridge aggregator shortlisted. Order book schema and Epson test printer running.</td><td>Applications acknowledged by both platforms</td></tr>
+    <tr><td>T-6</td><td>Sandbox orders from both platforms reach the order book. Bridge aggregator contract signed, month to month.</td><td>A sandbox order prints a station chit</td></tr>
+    <tr><td>T-4</td><td>Accept rules and printing alerts built. Kitchen screen and reprint working. Website delivery books a driver in test mode.</td><td>10 test orders per channel, none lost</td></tr>
+    <tr><td>T-2</td><td>Full dress rehearsal in the renovated kitchen on the real printers and network. Staff walk-through, one page of instructions.</td><td>Median order to chit under 20 seconds</td></tr>
+    <tr><td>T-0</td><td>Open with the bridge live and the tablets still on the counter. Turn integration on per marketplace store, one at a time.</td><td>Every order matched against the platform dashboard each day</td></tr>
+    <tr><td>T+2</td><td>If 14 days are clean, tablets go away. Payout ledger starts.</td><td>Zero silent drops for 14 days</td></tr>
+    <tr><td>T+8</td><td>Direct API approved? Swap the bridge for direct adapters, one platform at a time.</td><td>Same ticket flow, lower monthly fee</td></tr>
+  </table></div>
+  <p class="callout"><b>If approval is late, nothing slips.</b> The bridge carries January, and the tablets stay as the fallback until the order book has matched two clean weeks.</p>
+</section>
+
+<section id="risks">
+  <span class="eyebrow">What could go wrong</span>
+  <h2>Risk register</h2>
+  <div class="scroll"><table>
+    <tr><th>Risk</th><th>Likelihood</th><th>Impact</th><th>What I would do</th></tr>
+    <tr><td>Direct API approval is slow or refused for a single brand</td><td>High</td><td>Medium</td><td>Bridge aggregator for launch, identical adapter interface, so the swap is a config change. Ask each partner manager in week 1.</td></tr>
+    <tr><td>An Uber order is not accepted inside 11.5 minutes and auto-cancels</td><td>Medium</td><td>High</td><td>Auto-accept under a load limit. A human alert at minute 3. Deny with a reason at minute 8, never leave it to time out.</td></tr>
+    <tr><td>Printer is offline or out of paper, chit never prints</td><td>Medium</td><td>High</td><td>Print status tracked per order, 45 second alert, order also on the kitchen screen, one-tap reprint.</td></tr>
+    <tr><td>Duplicate or replayed webhooks create two tickets</td><td>Medium</td><td>Medium</td><td>Unique key on platform order id plus store. Raw payload saved for replay.</td></tr>
+    <tr><td>Menu items out of sync, so an item is sold that the kitchen no longer has</td><td>High</td><td>Medium</td><td>Treat the order book menu as the master. Push availability to both platforms, and flag any order with an unknown item before accepting.</td></tr>
+    <tr><td>Platform changes its API or rate limits</td><td>Low</td><td>Medium</td><td>Adapters are isolated per channel. Contract tests against the sandbox run daily.</td></tr>
+    <tr><td>Tax and payout reporting does not match the accountant's needs</td><td>Medium</td><td>Medium</td><td>Show the accountant a sample export in week 4, not at month-end.</td></tr>
+    <tr><td>Staff find the new flow confusing during the opening rush</td><td>Medium</td><td>High</td><td>Rehearsal at T-2, tablets stay as fallback, one named owner for the first two weeks.</td></tr>
+  </table></div>
+  <p style="color:var(--muted);font-size:.9rem">Likelihood and impact are my own estimates before seeing your volumes, and I would re-rate them after the first pilot week.</p>
+</section>
+
+<section id="idea">
+  <span class="eyebrow">03 · The idea I want to try</span>
+  <h2>A payout auditor that nobody has to remember to run</h2>
+  <p>Marketplaces take commission, fees, promotions and adjustments, then pay out in batches. Errors, missing items refunded to guests and wrong fees are routinely absorbed because checking is tedious. Your own order book is the one source that knows what should have been paid.</p>
+  <div class="card">
+    <h3>First small experiment (a week, no integration needed)</h3>
+    <ul>
+      <li>Export last month's payout reports from DoorDash and Uber Eats.</li>
+      <li>An agent matches each line to what the kitchen actually made, flags mismatches (fee rate off, order missing, refund without a dispute) and drafts the support message with evidence attached.</li>
+      <li>A person reviews and sends. Measured by dollars recovered per month and minutes saved.</li>
+    </ul>
+    <p>It is the one place AI is clearly cheaper than a person, it pays for itself in a measurable number, and it proves the "fees and payouts" box on your diagram. Next after that: a kitchen-load agent that pauses a marketplace store when the line is overloaded.</p>
+  </div>
+</section>
+
+<section id="how">
+  <span class="eyebrow">04 · How I build</span>
+  <h2>Alongside your hosted platform</h2>
+  <p>The adapters sit beside the platform, not inside it: small services that speak only through the order desk's own API, with webhooks in and the order book as the one place state lives. Nothing changes for Counter, Kiosk or Catering. I would want read access to the order desk and its API docs on day one.</p>
+  <div class="todo"><b>To fill in before sending:</b> the tools I actually use day to day, 05 · a design I am proud of (link and why it looks right), and 06 · where I live, onsite in Vancouver 2+ days a week, side businesses, and start date. These are personal facts only the applicant can state.</div>
+</section>
+
+<section id="questions">
+  <span class="eyebrow">Questions for the page</span>
+  <h2>Ones I would ask Tractor</h2>
+  <ul>
+    <li>Which hosted platform runs the order desk, and does it expose a webhook or REST API for creating orders?</li>
+    <li>Do the marketplace stores already have partner managers, and is the Kits location the only one in scope for January?</li>
+    <li>Is paying a bridge aggregator for a few months acceptable if direct approval is slow?</li>
+    <li>Which Epson models are installed, and are they network or USB connected?</li>
+  </ul>
+  <p class="eyebrow">Sources: DoorDash Marketplace developer docs · Uber Eats Marketplace developer docs · Epson Server Direct Print documentation</p>
+</section>
+</main>
