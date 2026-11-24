@@ -234,13 +234,13 @@ a{color:var(--green)}
 
 <script>
 (function(){
-  document.querySelectorAll('table').forEach(function(t){
+  document.addEventListener('DOMContentLoaded',function(){document.querySelectorAll('table').forEach(function(t){
     if(t.id==='book') return;
     var rows=t.querySelectorAll('tr'); if(!rows.length) return;
     var heads=[].map.call(rows[0].children,function(h){return h.textContent;});
     t.classList.add('stack');
     [].slice.call(rows,1).forEach(function(r){[].forEach.call(r.children,function(c,i){c.setAttribute('data-label',heads[i]||'');});});
-  });
+  });});
   var n=1040, menu={
     "DoorDash":[["Brisket sandwich","Grill"],["Slaw","Cold"]],
     "Uber Eats":[["Pulled pork bowl","Grill"],["Pickles","Cold"],["Brownie","Expo"]],
