@@ -31,6 +31,8 @@ p{margin:0}
 .lede{font-size:1.15rem;color:var(--muted);max-width:60ch}
 section{display:flex;flex-direction:column;gap:18px;min-width:0}
 .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.card h3{color:var(--green)}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:18px;display:flex;flex-direction:column;gap:8px;min-width:0}
 .card p,.card li{color:var(--muted);font-size:.95rem}
 ul{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:6px}
@@ -68,12 +70,12 @@ a{color:var(--green)}
 
 <section id="tldr">
   <span class="eyebrow">The answer in 30 seconds</span>
-  <div class="grid2">
+  <div class="grid3">
     <div class="card"><h3>1 · Get in the door</h3><p>Apply for direct DoorDash and Uber Eats API access on day one. Use a month-to-month certified aggregator as a bridge so January does not depend on their approval clock.</p></div>
     <div class="card"><h3>2 · Own the middle</h3><p>One order book, one adapter per channel, one status line. Printing is tracked like any other status, so a missed chit is an alert, not a surprise.</p></div>
     <div class="card"><h3>3 · Prove the money</h3><p>Fees and payouts are reconciled per order. That is also my first experiment: an agent that audits marketplace payouts.</p></div>
   </div>
-  <p><a href="#demo">Skip to the clickable prototype ↓</a></p>
+  <p><a class="btn" href="#demo" style="display:inline-block;text-decoration:none">Try the clickable prototype ↓</a></p>
 </section>
 
 <section id="map">
