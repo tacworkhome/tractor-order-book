@@ -289,13 +289,25 @@ a{color:var(--green)}
   <p>The adapters sit beside the platform, not inside it: small services that speak only through the order desk's own API, with webhooks in and the order book as the one place state lives. Nothing changes for Counter, Kiosk or Catering. I would want read access to the order desk and its API docs on day one.</p>
   <h3>What I build with every day</h3>
   <div class="grid2">
-    <div class="card"><span class="tag">AI</span><p>Claude Code for most of my coding, planning and review.</p></div>
-    <div class="card"><span class="tag">Languages and UI</span><p>TypeScript, React, React Native, Node.js.</p></div>
+    <div class="card"><span class="tag">AI</span><p>Claude Code for most of my coding, planning and review. The Claude API for agent workflows with tool use and web search.</p></div>
+    <div class="card"><span class="tag">Languages and UI</span><p>TypeScript, React, Next.js, React Native, Node.js.</p></div>
     <div class="card"><span class="tag">Data and APIs</span><p>REST APIs, PostgreSQL, Supabase.</p></div>
     <div class="card"><span class="tag">Shipping</span><p>GitHub for code and review, Vercel for hosting.</p></div>
   </div>
   <p>That stack fits your setup. The adapters are small Node and TypeScript services, the order book tables and the raw webhook payloads sit in Postgres, and a hosted web-app platform is a normal place for me to add a service or a screen without touching what already runs.</p>
-  <div class="todo"><b>To fill in before sending:</b> 05 · a design I am proud of (link and why it looks right).</div>
+</section>
+
+<section id="taste">
+  <span class="eyebrow">05 · Your taste</span>
+  <h2>Something I built and run: InsiderAct</h2>
+  <p><a href="https://insideract.com" target="_blank" rel="noopener">insideract.com</a> is an AI-native research platform I built alone and launched in July 2025. It reads SEC insider filings, filters out the noise, and shows a short list of high-conviction signals. Behind it are agentic research workflows on the Claude API with cited answers, and millions of insider-transaction records from EDGAR and market data in one Postgres layer. It is built with Next.js, TypeScript, Supabase and Vercel.</p>
+  <h3>Why it looks right to me</h3>
+  <ul>
+    <li><b>One accent, one meaning.</b> Green means "act" and "buy" everywhere, so colour is never decoration.</li>
+    <li><b>Every signal is scored and labelled</b> (for example 80/100, Very Strong), so ten of them can be compared in seconds.</li>
+    <li><b>The filtered few come first.</b> The page leads with the strongest signals and lets people go deeper, instead of showing every filing at once.</li>
+  </ul>
+  <p>It is also the closest thing I have to your problem: messy outside data in, one clean record per item out, and a person who has to trust it.</p>
 </section>
 
 <section id="commitment">
