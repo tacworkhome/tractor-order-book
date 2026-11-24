@@ -32,6 +32,8 @@ p{margin:0}
 .lede{font-size:1.15rem;color:var(--muted);max-width:60ch}
 section{display:flex;flex-direction:column;gap:18px;min-width:0}
 .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:12px}
+.grid4 .card{padding:14px}
 .grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
 .card h3{color:var(--green)}
 .preview{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:8px;overflow:hidden;text-decoration:none;color:var(--fg);box-shadow:0 6px 24px rgba(0,0,0,.08);transition:transform .15s}
@@ -164,7 +166,7 @@ a{color:var(--green)}
 <section id="adapter">
   <span class="eyebrow">The part we own regardless of approval</span>
   <h2>One adapter per channel, one state machine</h2>
-  <div class="grid2">
+  <div class="grid4">
     <div class="card"><h3>Ingest</h3><p>A small webhook service per marketplace. It verifies the signature, stores the raw payload untouched, maps it to Tractor's order shape and writes it to the order book. The raw copy means we can replay anything.</p></div>
     <div class="card"><h3>Idempotency</h3><p>Marketplace order id plus store id is a unique key. Retries and duplicate webhooks cannot make two tickets.</p></div>
     <div class="card"><h3>Accept rules</h3><p>Auto-accept when the kitchen is under a load limit and every item is in stock. Otherwise alert a human well inside the 11.5 minute window, and deny with a reason before it times out.</p></div>
